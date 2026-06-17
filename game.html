@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ponte a pintar mamawevo ✦</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════ RESET & TOKENS ══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:  #2f5d73;
+      --blue-mid:   #5b8fa8;
+      --blue-light: #a9cbd6;
+      --blue-pale:  #e7f1f3;
+      --blue-ultra: #f7fbfb;
+      --white:      #ffffff;
+      --shadow:     rgba(47, 93, 115, 0.16);
+      --cream:      #faf3e7;
+      --cream-line: rgba(47, 93, 115, 0.08);
+      --tape-pink:  #f4b8c4;
+      --tape-mint:  #b9e0c9;
+      --tape-yellow:#f6dd9b;
+      --accent:     #e8889a;
+      --font-display: 'Baloo 2', 'Segoe UI', sans-serif;
+      --font-body:    'Quicksand', 'Segoe UI', sans-serif;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-body);
+      color: var(--blue-dark);
+      overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+      /* fondo crema cálido y sólido, como una hoja de scrapbook,
+         en vez de un degradado multicolor */
+      background: var(--cream);
+    }
+    /* Capa de cuadrícula: un grid sutil de líneas tipo "papel cuadriculado"
+       que se desvanece hacia la parte inferior de la pantalla. */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--cream-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--cream-line) 1px, transparent 1px);
+      background-size: 34px 34px;
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 85%);
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 85%);
+    }
+    /* Capa de chispitas: unas pocas estrellitas blancas con borde fino,
+       sin glow exagerado, flotando despacio. */
+    #sparkleLayer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .sparkle {
+      position: absolute;
+      color: #ffffff;
+      -webkit-text-stroke: 1px rgba(47, 93, 115, 0.18);
+      animation: sparkle-float linear infinite, sparkle-twinkle ease-in-out infinite;
+      user-select: none;
+    }
+    @keyframes sparkle-float {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-120vh); }
+    }
+    @keyframes sparkle-twinkle {
+      0%, 100% { opacity: 0.25; transform: scale(0.85); }
+      50% { opacity: 0.9; transform: scale(1.05); }
+    }
+    /* Todo el contenido real va por encima de las capas decorativas */
+    .screen, #sparkleLayer + * { position: relative; z-index: 1; }
+    .screen { position: relative; z-index: 1; }
+
+    /* ══════════════════════════════════════════ SCREENS ══════════════════════════════════════════ */
+    .screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+    .screen.hidden { display: none !important; }
+
+    /* ══════════════════════════════════════════ MENU SCREEN ══════════════════════════════════════════ */
+    .menu-card {
+      background: rgba(255,255,255,0.94);
+      border-radius: 32px;
+      border: 2.5px dashed var(--tape-pink);
+      padding: 2.1rem 1.75rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 6px 0 var(--blue-pale), 0 14px 44px var(--shadow);
+      position: relative;
+    }
+    .menu-card::before {
+      content: '';
+      position: absolute;
+      top: -13px;
+      left: 26px;
+      width: 56px;
+      height: 26px;
+      background: var(--tape-pink);
+      opacity: 0.85;
+      transform: rotate(-8deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .menu-card::after {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      right: 30px;
+      width: 48px;
+      height: 22px;
+      background: var(--tape-mint);
+      opacity: 0.85;
+      transform: rotate(6deg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .game-title {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    .title-accent {
+      display: inline-block;
+      margin-top: 2px;
+      color: var(--accent);
+    }
+    .game-sub {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--blue-mid);
+      margin-bottom: 1.5rem;
+    }
+    .photos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .photo-frame {
+      border-radius: 16px;
+      border: 2.5px solid var(--blue-pale);
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 1;
+      background: var(--blue-pale);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+    .photo-frame:hover { border-color: var(--tape-pink); transform: scale(1.05) rotate(-1deg); }
+    .photo-frame.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--blue-pale); }
+    .photo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .btn-play {
+      width: 100%;
+      padding: 1rem;
+      font-family: var(--font-display);
+      background: var(--blue-dark);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #1d4252;
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .btn-play:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #1d4252; }
+    .btn-play:active { transform: translateY(3px); box-shadow: 0 2px 0 #1d4252; }
+
+    /* ══════════════════════════════════════════ GAME SCREEN ══════════════════════════════════════════ */
+    #gameScreen { flex-direction: column; padding: 0; }
+    .game-topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.6rem 1rem;
+      background: rgba(255,255,255,0.92);
+      border-bottom: 2px dashed var(--blue-pale);
+      flex-shrink: 0;
+    }
+    .btn-back {
+      background: var(--blue-pale);
+      border: 2px solid var(--blue-pale);
+      border-radius: 50px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 800;
+      font-family: var(--font-body);
+      color: var(--blue-dark);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-back:hover { background: var(--blue-pale); }
+    .topbar-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex: 1;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .progress-wrap {
+      width: 70px;
+      height: 10px;
+      background: #f3e0f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--blue-mid);
+      transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .game-layout {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .canvas-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--blue-ultra);
+      padding: 12px;
+      position: relative;
+      min-height: 0;
+    }
+    .canvas-container {
+      position: relative;
+      display: inline-block;
+    }
+    #gameCanvas {
+      display: block;
+      border-radius: 16px;
+      border: 3px dashed var(--blue-light);
+      box-shadow: 0 6px 28px var(--shadow);
+      cursor: crosshair;
+      max-width: 100%;
+      max-height: 100%;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .region-labels {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .region-num {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      pointer-events: none;
+      user-select: none;
+      line-height: 1;
+      white-space: nowrap;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      border: 1.5px solid rgba(37, 99, 176, 0.35);
+      box-shadow: 0 1px 4px rgba(37,99,176,0.18);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+    .region-num.faded { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(232,240,254,0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 10;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .loading-spinner {
+      width: 38px;
+      height: 38px;
+      border: 4px solid var(--blue-light);
+      border-top-color: var(--blue-dark);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .palette-panel {
+      width: 118px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.92);
+      border-left: 2px dashed var(--blue-pale);
+      padding: 0.8rem 0.55rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+    }
+    .palette-header {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      padding-bottom: 4px;
+      border-bottom: 2px dashed var(--blue-pale);
+    }
+    .palette-swatches { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .swatch-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 7px;
+      border-radius: 14px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      background: var(--blue-ultra);
+      transition: all 0.15s;
+    }
+    .swatch-row:hover { border-color: var(--tape-pink); transform: scale(1.04); }
+    .swatch-row.active { border-color: var(--accent); background: var(--blue-pale); transform: scale(1.06); box-shadow: 0 2px 8px var(--shadow); }
+    .swatch-row.correct { opacity: 0.32; pointer-events: none; filter: grayscale(0.6); }
+    .swatch-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
+      flex-shrink: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 900;
+    }
+    .swatch-num { font-size: 0.72rem; font-weight: 800; color: var(--blue-dark); opacity: 0.75; }
+    .palette-hint {
+      font-family: var(--font-body);
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--blue-mid);
+      text-align: center;
+      padding-top: 4px;
+      border-top: 1px dashed var(--blue-pale);
+      min-height: 1.4em;
+    }
+
+    /* ══════════════════════════════════════════ WIN SCREEN ══════════════════════════════════════════ */
+    .win-card {
+      background: rgba(255,255,255,0.94);
+      border-radius: 32px;
+      border: 2.5px dashed var(--tape-pink);
+      padding: 2.2rem 1.5rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 6px 0 var(--blue-pale), 0 18px 54px var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .win-emoji { font-size: 3.5rem; margin: 1rem 0; animation: win-bounce 2s ease-in-out infinite; }
+    @keyframes win-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .win-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0.5rem 0;
+    }
+    .win-sub { font-family: var(--font-body); font-size: 0.95rem; font-weight: 700; color: var(--blue-mid); margin-bottom: 1rem; }
+    .win-canvas { border-radius: 18px; border: 3px solid var(--blue-pale); max-width: 100%; margin: 1rem 0; box-shadow: 0 8px 24px var(--shadow); }
+
+    /* ══════════════════════════════════════════ MOBILE ══════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .game-layout { flex-direction: column; }
+      .palette-panel {
+        width: 100%;
+        height: 88px;
+        flex-direction: row;
+        flex-shrink: 0;
+        border-left: none;
+        border-top: 2px dashed var(--blue-light);
+        padding: 8px 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        align-items: center;
+        -webkit-overflow-scrolling: touch;
+        /* sin esto, los navegadores móviles pueden encoger el contenido
+           del flex en vez de permitir scroll, dejando colores fuera de
+           alcance e inaccesibles */
+        flex-wrap: nowrap;
+      }
+      .palette-header { display: none; }
+      .palette-hint { display: none; }
+      .palette-swatches {
+        flex-direction: row;
+        gap: 9px;
+        flex-wrap: nowrap;
+        height: 100%;
+        align-items: center;
+        /* fuerza a que el contenido pueda exceder el ancho visible,
+           habilitando así el scroll en vez de comprimir los swatches */
+        width: max-content;
+        min-width: max-content;
+      }
+      .swatch-row {
+        flex-direction: column;
+        gap: 3px;
+        min-width: 52px;
+        flex-shrink: 0;
+      }
+      .swatch-circle { width: 28px; height: 28px; }
+    }
+  </style>
+</head>
+<body>
+<div id="sparkleLayer"></div>
+
+<!-- MENU SCREEN -->
+<div class="screen" id="menuScreen">
+  <div class="menu-card">
+    <h1 class="game-title">Ponte a pintar<br><span class="title-accent">mamawevo</span></h1>
+    <p class="game-sub">elige una foto para pintar</p>
+    <div class="photos-grid" id="photosGrid"></div>
+    <button class="btn-play" onclick="startGame()">jugar</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen hidden" id="gameScreen">
+  <div class="game-topbar">
+    <button class="btn-back" onclick="goMenu()">← volver</button>
+    <span class="topbar-title">Ponte a pintar mamawevo</span>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+  </div>
+  <div class="game-layout">
+    <div class="canvas-wrap" id="canvasWrap">
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>procesando imagen…</p>
+      </div>
+      <div class="canvas-container" id="canvasContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div class="region-labels" id="regionLabels"></div>
+      </div>
+    </div>
+    <div class="palette-panel">
+      <div class="palette-header">🎨 paleta</div>
+      <div class="palette-swatches" id="paletteSwatches"></div>
+      <div class="palette-hint" id="paletteHint">toca región, luego color</div>
+    </div>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div class="screen hidden" id="winScreen">
+  <div class="win-card">
+    <div class="win-emoji">🎉</div>
+    <h2 class="win-title">¡Lo lograste!</h2>
+    <p class="win-sub">Completaste el cuadro~</p>
+    <canvas id="winCanvas" class="win-canvas"></canvas>
+    <button class="btn-play" onclick="goMenu()" style="max-width:200px;">✦ volver al menú</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const PHOTOS = [
+  { id: 0, src: 'img/1.png', label: 'foto 1' },
+  { id: 1, src: 'img/2.png', label: 'foto 2' },
+  { id: 2, src: 'img/3.png', label: 'foto 3' },
+];
+
+const MAX_COLORS = 7;
+const KMEANS_ITERS = 25;
+const SAMPLE_STEP = 3;
+const SMOOTH_PASSES = 4;
+// Regiones por debajo de este tamaño se fusionan con la región vecina
+// más grande del mismo color (evita "miguitas" sueltas).
+const MERGE_MIN_PX = 180;
+// Por debajo de este tamaño tras la fusión, la región se rellena sola
+// en lugar de pedir al jugador que pinte una zona casi invisible.
+const MIN_REGION_PX = 900;
+// Por debajo de este tamaño no se dibuja número (regiones jugables muy
+// pequeñas igualmente se pintan al tocar la zona, solo no llevan etiqueta).
+const LABEL_MIN_PX = 900;
+// Distancia mínima en píxeles de imagen entre dos etiquetas para que
+// ambas se muestren; si están más cerca, se omite la más pequeña.
+const LABEL_MIN_DIST = 26;
+
+let selectedPhotoIdx = 0;
+let gameState = null;
+
+/* ──────────────────────────────────────────────── UTILS ──────────────────────────────────────────────── */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function colorDistSq(a, b) {
+  return (a[0]-b[0])**2 + (a[1]-b[1])**2 + (a[2]-b[2])**2;
+}
+
+function relativeLuminance([r, g, b]) {
+  // Percepción de brillo estándar (coeficientes ITU-R BT.601),
+  // usada para ordenar la paleta de claro a oscuro de forma intuitiva.
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+function bestTextColor([r, g, b]) {
+  return relativeLuminance([r, g, b]) > 150 ? '#2563b0' : '#ffffff';
+}
+
+/* ──────────────────────────────────────────────── MENU ──────────────────────────────────────────────── */
+function buildGrid() {
+  const grid = document.getElementById('photosGrid');
+  grid.innerHTML = '';
+  PHOTOS.forEach(p => {
+    const frame = document.createElement('div');
+    frame.className = 'photo-frame' + (p.id === selectedPhotoIdx ? ' selected' : '');
+    frame.onclick = () => { selectedPhotoIdx = p.id; buildGrid(); };
+    const img = document.createElement('img');
+    img.src = p.src;
+    img.alt = p.label;
+    img.onerror = function() { this.parentElement.innerHTML = '📷'; };
+    frame.appendChild(img);
+    grid.appendChild(frame);
+  });
+}
+
+function startGame() {
+  const photo = PHOTOS[selectedPhotoIdx];
+  showScreen('gameScreen');
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  document.getElementById('loadingOverlay').innerHTML =
+    '<div class="loading-spinner"></div><p>procesando imagen…</p>';
+  document.getElementById('regionLabels').innerHTML = '';
+  document.getElementById('paletteSwatches').innerHTML = '';
+  document.getElementById('progressBar').style.width = '0%';
+  gameState = null;
+
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => processImage(img);
+  img.onerror = () => {
+    document.getElementById('loadingOverlay').innerHTML = '<p style="color:#e05;">Error cargando imagen</p>';
+  };
+  img.src = photo.src;
+}
+
+function goMenu() {
+  showScreen('menuScreen');
+  gameState = null;
+}
+
+/* ──────────────────────────────────────────────── IMAGE PROCESSING ──────────────────────────────────────────────── */
+function processImage(img) {
+  setTimeout(() => {
+    try { _processImage(img); }
+    catch (e) {
+      console.error(e);
+      document.getElementById('loadingOverlay').innerHTML = '<p style="color:#e05;">' + e.message + '</p>';
+    }
+  }, 50);
+}
+
+function _processImage(img) {
+  const maxDim = 500;
+  let gw = img.naturalWidth, gh = img.naturalHeight;
+  if (gw > maxDim || gh > maxDim) {
+    const s = Math.min(maxDim / gw, maxDim / gh);
+    gw = Math.round(gw * s);
+    gh = Math.round(gh * s);
+  }
+
+  const off = document.createElement('canvas');
+  off.width = gw; off.height = gh;
+  const offCtx = off.getContext('2d', { willReadFrequently: true });
+  offCtx.drawImage(img, 0, 0, gw, gh);
+  const pixels = offCtx.getImageData(0, 0, gw, gh).data;
+
+  let { palette, assignment } = kmeansQuantize(pixels, gw, gh, MAX_COLORS, KMEANS_ITERS, SAMPLE_STEP);
+  smoothAssignment(assignment, gw, gh, palette.length, SMOOTH_PASSES);
+
+  // ── Reordenar la paleta de más claro a más oscuro ──
+  // Esto es lo que hace que la numeración sea intuitiva: el color 1
+  // siempre es el más claro del cuadro y los números van "oscureciendo"
+  // en orden, en vez de depender del azar de k-means.
+  const order = palette
+    .map((c, i) => ({ i, lum: relativeLuminance(c) }))
+    .sort((a, b) => b.lum - a.lum) // claro -> oscuro
+    .map(o => o.i);
+  const remap = new Array(palette.length);
+  order.forEach((origIdx, newIdx) => { remap[origIdx] = newIdx; });
+  palette = order.map(i => palette[i]);
+  const remappedAssignment = new Uint8Array(assignment.length);
+  for (let i = 0; i < assignment.length; i++) remappedAssignment[i] = remap[assignment[i]];
+  assignment = remappedAssignment;
+
+  const { regionMap, regions } = labelRegions(assignment, gw, gh);
+  mergeSmallRegions(regionMap, regions, gw, gh);
+
+  const displayNum = {};
+  let displayIdx = 1;
+  for (let i = 0; i < palette.length; i++) {
+    const hasRegion = regions.some(r => r.colorIdx === i && r.pixelCount >= MIN_REGION_PX);
+    if (hasRegion) displayNum[i] = displayIdx++;
+  }
+
+  const outlineCanvas = buildOutlineCanvas(pixels, regionMap, gw, gh);
+  const canvas = document.getElementById('gameCanvas');
+  const wrapEl = document.getElementById('canvasWrap');
+  const maxCanW = wrapEl.clientWidth - 24;
+  const maxCanH = wrapEl.clientHeight - 24;
+  const dispScale = Math.min(maxCanW / gw, maxCanH / gh, 1);
+  canvas.width = gw;
+  canvas.height = gh;
+  canvas.style.width = Math.round(gw * dispScale) + 'px';
+  canvas.style.height = Math.round(gh * dispScale) + 'px';
+
+  const outCtx = outlineCanvas.getContext('2d');
+  const baseImgData = outCtx.getImageData(0, 0, gw, gh);
+  const basePixelData = new Uint8ClampedArray(baseImgData.data);
+
+  const isEdgePx = new Uint8Array(gw * gh);
+  for (let i = 0; i < gw * gh; i++) {
+    if (basePixelData[i*4] === 37 && basePixelData[i*4+1] === 99 && basePixelData[i*4+2] === 176 && basePixelData[i*4+3] > 100) {
+      isEdgePx[i] = 1;
+    }
+  }
+
+  const regionPixels = Array.from({ length: regions.length }, () => []);
+  for (let i = 0; i < gw * gh; i++) {
+    if (!isEdgePx[i]) regionPixels[regionMap[i]].push(i);
+  }
+
+  const workingData = new Uint8ClampedArray(basePixelData);
+
+  gameState = {
+    gw, gh, palette, regionMap, regions, regionPixels, isEdgePx, basePixelData, workingData, outlineCanvas,
+    displayNum, filled: {}, selectedRegion: null, selectedColor: null, totalRegions: 0, filledCount: 0, dispScale,
+  };
+
+  for (let rid = 0; rid < regions.length; rid++) {
+    if (regions[rid].pixelCount < MIN_REGION_PX) {
+      gameState.filled[rid] = 'auto';
+      const [r, g, b] = palette[regions[rid].colorIdx];
+      for (const i of regionPixels[rid]) {
+        workingData[i*4] = r;
+        workingData[i*4+1] = g;
+        workingData[i*4+2] = b;
+        workingData[i*4+3] = 255;
+      }
+    } else {
+      gameState.totalRegions++;
+    }
+  }
+
+  // IMPORTANTE: clonar el canvas (para limpiar listeners de partidas
+  // anteriores) tiene que pasar ANTES de dibujar nada en él. Clonar un
+  // <canvas> no copia su contenido pixel a pixel, así que si se dibuja
+  // primero y se clona después, el dibujo desaparece y el lienzo se ve
+  // en blanco hasta el primer commitDraw() posterior (al pintar la
+  // primera región). Por eso se reordena aquí.
+  setupCanvasInteraction(canvas);
+  commitDraw();
+  buildPalette(palette, regions, displayNum);
+  buildRegionLabels(regions, displayNum, gw, gh, regionPixels);
+  document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+/* ──────────────────────────────────────────────── K-MEANS ──────────────────────────────────────────────── */
+function kmeansQuantize(pixels, w, h, k, maxIter, step) {
+  const n = w * h;
+  const samples = [];
+  for (let i = 0; i < n; i += step) {
+    if (pixels[i*4+3] < 128) continue;
+    samples.push([pixels[i*4], pixels[i*4+1], pixels[i*4+2]]);
+  }
+  if (samples.length === 0) throw new Error('No opaque pixels');
+
+  const centroids = [samples[Math.floor(Math.random() * samples.length)]];
+  while (centroids.length < Math.min(k, samples.length)) {
+    const dists = samples.map(s => {
+      let minD = Infinity;
+      for (const c of centroids) { const d = colorDistSq(s, c); if (d < minD) minD = d; }
+      return minD;
+    });
+    const total = dists.reduce((a, b) => a + b, 0);
+    if (total === 0) { centroids.push([...samples[centroids.length]]); continue; }
+    let r = Math.random() * total, idx = 0;
+    for (let i = 0; i < dists.length; i++) { r -= dists[i]; if (r <= 0) { idx = i; break; } }
+    centroids.push([...samples[idx]]);
+  }
+  const K = centroids.length;
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    const sums = Array.from({ length: K }, () => [0, 0, 0, 0]);
+    for (let i = 0; i < n; i += step) {
+      if (pixels[i*4+3] < 128) continue;
+      const rv = pixels[i*4], gv = pixels[i*4+1], bv = pixels[i*4+2];
+      let best = 0, bestD = Infinity;
+      for (let c = 0; c < K; c++) {
+        const d = colorDistSq([rv, gv, bv], centroids[c]);
+        if (d < bestD) { bestD = d; best = c; }
+      }
+      sums[best][0] += rv; sums[best][1] += gv; sums[best][2] += bv; sums[best][3]++;
+    }
+    let moved = false;
+    for (let c = 0; c < K; c++) {
+      if (!sums[c][3]) continue;
+      const nr = sums[c][0]/sums[c][3], ng = sums[c][1]/sums[c][3], nb = sums[c][2]/sums[c][3];
+      if (Math.abs(nr-centroids[c][0])>0.5 || Math.abs(ng-centroids[c][1])>0.5 || Math.abs(nb-centroids[c][2])>0.5) moved = true;
+      centroids[c] = [nr, ng, nb];
+    }
+    if (!moved && iter > 3) break;
+  }
+
+  const assignment = new Uint8Array(n);
+  for (let i = 0; i < n; i++) {
+    if (pixels[i*4+3] < 128) { assignment[i] = 0; continue; }
+    const rv = pixels[i*4], gv = pixels[i*4+1], bv = pixels[i*4+2];
+    let best = 0, bestD = Infinity;
+    for (let c = 0; c < K; c++) {
+      const d = colorDistSq([rv, gv, bv], centroids[c]);
+      if (d < bestD) { bestD = d; best = c; }
+    }
+    assignment[i] = best;
+  }
+
+  const palette = centroids.map(c => [Math.round(c[0]), Math.round(c[1]), Math.round(c[2])]);
+  return { palette, assignment };
+}
+
+/* ──────────────────────────────────────────────── SMOOTH ──────────────────────────────────────────────── */
+function smoothAssignment(assignment, w, h, k, passes) {
+  const n = w * h;
+  const counts = new Int32Array(k);
+  let curr = new Uint8Array(assignment);
+  let next = new Uint8Array(n);
+
+  for (let pass = 0; pass < passes; pass++) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        counts.fill(0);
+        for (let dy = -1; dy <= 1; dy++) {
+          const ny = y + dy;
+          if (ny < 0 || ny >= h) continue;
+          for (let dx = -1; dx <= 1; dx++) {
+            const nx = x + dx;
+            if (nx < 0 || nx >= w) continue;
+            counts[curr[ny * w + nx]]++;
+          }
+        }
+        let best = curr[y*w+x], bestC = 0;
+        for (let c = 0; c < k; c++) {
+          if (counts[c] > bestC) { bestC = counts[c]; best = c; }
+        }
+        next[y*w+x] = best;
+      }
+    }
+    const tmp = curr; curr = next; next = tmp;
+  }
+  assignment.set(curr);
+}
+
+/* ──────────────────────────────────────────────── FLOOD-FILL ──────────────────────────────────────────────── */
+function labelRegions(assignment, w, h) {
+  const n = w * h;
+  const regionMap = new Int32Array(n).fill(-1);
+  const regions = [];
+  const queue = new Int32Array(n);
+  let nextId = 0;
+
+  for (let start = 0; start < n; start++) {
+    if (regionMap[start] !== -1) continue;
+    const colorIdx = assignment[start];
+    const rid = nextId++;
+    regions.push({ colorIdx, pixelCount: 0 });
+
+    let head = 0, tail = 0;
+    queue[tail++] = start;
+    regionMap[start] = rid;
+
+    while (head < tail) {
+      const px = queue[head++];
+      regions[rid].pixelCount++;
+      const x = px % w, y = (px / w) | 0;
+
+      if (x > 0 && regionMap[px-1] === -1 && assignment[px-1] === colorIdx) { regionMap[px-1]=rid; queue[tail++]=px-1; }
+      if (x < w-1 && regionMap[px+1] === -1 && assignment[px+1] === colorIdx) { regionMap[px+1]=rid; queue[tail++]=px+1; }
+      if (y > 0 && regionMap[px-w] === -1 && assignment[px-w] === colorIdx) { regionMap[px-w]=rid; queue[tail++]=px-w; }
+      if (y < h-1 && regionMap[px+w] === -1 && assignment[px+w] === colorIdx) { regionMap[px+w]=rid; queue[tail++]=px+w; }
+    }
+  }
+  return { regionMap, regions };
+}
+
+/* ──────────────────────────────────────────────── MERGE SMALL REGIONS ──────────────────────────────────────────────── */
+// Las regiones diminutas ("miguitas" que aparecen en zonas con textura o
+// ruido) se fusionan con la región vecina más grande que tenga el MISMO
+// color. Esto es clave para que el número total de zonas jugables baje
+// drásticamente y la pantalla no se llene de etiquetas superpuestas.
+function mergeSmallRegions(regionMap, regions, w, h) {
+  const n = w * h;
+
+  // Repetimos varias pasadas: al fusionar una región diminuta, su vecino
+  // puede pasar a ser, a su vez, candidato de fusión con otro más grande.
+  for (let pass = 0; pass < 3; pass++) {
+    let mergedAny = false;
+
+    // unionFind simplificado: cada región apunta a su "dueño final"
+    const parent = regions.map((_, i) => i);
+    function find(i) { while (parent[i] !== i) i = parent[i]; return i; }
+
+    for (let rid = 0; rid < regions.length; rid++) {
+      if (regions[rid].pixelCount === 0) continue;
+      if (regions[rid].pixelCount >= MERGE_MIN_PX) continue;
+
+      // Buscar, entre los vecinos directos, el de mayor tamaño con mismo color
+      const neighborSize = new Map();
+      for (let i = 0; i < n; i++) {
+        if (regionMap[i] !== rid) continue;
+        const x = i % w, y = (i / w) | 0;
+        const checkNeighbor = (ni) => {
+          const nrid = find(regionMap[ni]);
+          if (nrid === find(rid)) return;
+          if (regions[nrid].colorIdx !== regions[rid].colorIdx) return;
+          neighborSize.set(nrid, (neighborSize.get(nrid) || 0) + 1);
+        };
+        if (x > 0) checkNeighbor(i - 1);
+        if (x < w - 1) checkNeighbor(i + 1);
+        if (y > 0) checkNeighbor(i - w);
+        if (y < h - 1) checkNeighbor(i + w);
+      }
+
+      if (neighborSize.size === 0) continue;
+      let bestNeighbor = -1, bestSize = -1;
+      for (const [nrid, cnt] of neighborSize) {
+        if (regions[nrid].pixelCount > bestSize) { bestSize = regions[nrid].pixelCount; bestNeighbor = nrid; }
+      }
+      if (bestNeighbor === -1) continue;
+
+      const root = find(bestNeighbor);
+      const me = find(rid);
+      if (root === me) continue;
+      parent[me] = root;
+      regions[root].pixelCount += regions[me].pixelCount;
+      regions[me].pixelCount = 0;
+      mergedAny = true;
+    }
+
+    for (let i = 0; i < n; i++) regionMap[i] = find(regionMap[i]);
+
+    if (!mergedAny) break;
+  }
+}
+
+/* ──────────────────────────────────────────────── OUTLINE ──────────────────────────────────────────────── */
+function buildOutlineCanvas(origPixels, regionMap, w, h) {
+  const cvs = document.createElement('canvas');
+  cvs.width = w; cvs.height = h;
+  const ctx = cvs.getContext('2d');
+  const imgData = ctx.createImageData(w, h);
+  const d = imgData.data;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      const rid = regionMap[i];
+      let isEdge = false;
+      if (!isEdge && x > 0 && regionMap[i-1] !== rid) isEdge = true;
+      if (!isEdge && x < w-1 && regionMap[i+1] !== rid) isEdge = true;
+      if (!isEdge && y > 0 && regionMap[i-w] !== rid) isEdge = true;
+      if (!isEdge && y < h-1 && regionMap[i+w] !== rid) isEdge = true;
+
+      if (isEdge) {
+        d[i*4]=37; d[i*4+1]=99; d[i*4+2]=176; d[i*4+3]=220;
+      } else {
+        const rv = origPixels[i*4], gv = origPixels[i*4+1], bv = origPixels[i*4+2];
+        const grey = 0.299*rv + 0.587*gv + 0.114*bv;
+        const light = Math.min(255, Math.round(195 + grey * 0.24));
+        d[i*4]=light; d[i*4+1]=light; d[i*4+2]=Math.min(255,light+18); d[i*4+3]=255;
+      }
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  return cvs;
+}
+
+/* ──────────────────────────────────────────────── PALETTE ──────────────────────────────────────────────── */
+function buildPalette(palette, regions, displayNum) {
+  const container = document.getElementById('paletteSwatches');
+  container.innerHTML = '';
+
+  const hasPlayerRegion = new Array(palette.length).fill(false);
+  regions.forEach((r, rid) => {
+    if (gameState.filled[rid] !== 'auto') hasPlayerRegion[r.colorIdx] = true;
+  });
+
+  // Recorremos la paleta en orden (ya está ordenada claro -> oscuro),
+  // así el panel lateral queda en el mismo orden que los números del lienzo.
+  palette.forEach(([rv, gv, bv], idx) => {
+    if (!hasPlayerRegion[idx]) return;
+    const row = document.createElement('div');
+    row.className = 'swatch-row';
+    row.id = 'swatch-' + idx;
+    row.onclick = () => selectColor(idx);
+
+    const circle = document.createElement('div');
+    circle.className = 'swatch-circle';
+    circle.style.background = `rgb(${rv},${gv},${bv})`;
+    circle.style.color = bestTextColor([rv, gv, bv]);
+    circle.textContent = displayNum[idx] || '?';
+
+    const num = document.createElement('span');
+    num.className = 'swatch-num';
+    num.textContent = '#' + (displayNum[idx] || '?');
+
+    row.appendChild(circle);
+    row.appendChild(num);
+    container.appendChild(row);
+  });
+}
+
+/* ──────────────────────────────────────────────── LABELS ──────────────────────────────────────────────── */
+function buildRegionLabels(regions, displayNum, gw, gh, regionPixels) {
+  const labelsDiv = document.getElementById('regionLabels');
+  labelsDiv.innerHTML = '';
+
+  // 1) Calcular la posición candidata de cada región jugable.
+  const candidates = [];
+  regions.forEach((r, rid) => {
+    if (gameState.filled[rid] === 'auto') return;
+    if (r.pixelCount < LABEL_MIN_PX) return;
+
+    const pixels = regionPixels[rid] || [];
+    if (!pixels.length) return;
+
+    // Centroide del área en lugar del centro del bounding box: para formas
+    // en L o muy irregulares, el centro geométrico cae fuera de la región.
+    let sumX = 0, sumY = 0;
+    for (const i of pixels) {
+      sumX += i % gw;
+      sumY += (i / gw) | 0;
+    }
+    let cx = Math.round(sumX / pixels.length);
+    let cy = Math.round(sumY / pixels.length);
+
+    // Si el centroide cae fuera de la propia región (formas cóncavas),
+    // buscamos el píxel de la región más cercano a ese punto.
+    const centroidIdx = cy * gw + cx;
+    if (gameState.regionMap[centroidIdx] !== rid) {
+      let best = pixels[0], bestD = Infinity;
+      for (const i of pixels) {
+        const x = i % gw, y = (i / gw) | 0;
+        const d = (x - cx) ** 2 + (y - cy) ** 2;
+        if (d < bestD) { bestD = d; best = i; }
+      }
+      cx = best % gw;
+      cy = (best / gw) | 0;
+    }
+
+    candidates.push({ rid, colorIdx: r.colorIdx, cx, cy, count: pixels.length });
+  });
+
+  // 2) Colocar etiquetas de mayor a menor área. Si una candidata cae
+  // demasiado cerca de una ya colocada, se descarta (evita superposición).
+  // La región sigue siendo pintable al tocarla; solo se omite su número
+  // cuando ya hay otro muy próximo.
+  candidates.sort((a, b) => b.count - a.count);
+  const placed = [];
+
+  candidates.forEach(c => {
+    const tooClose = placed.some(p => {
+      const d = Math.hypot(p.cx - c.cx, p.cy - c.cy);
+      return d < LABEL_MIN_DIST;
+    });
+    if (tooClose) return;
+    placed.push(c);
+
+    const el = document.createElement('div');
+    el.className = 'region-num';
+    el.id = 'label-' + c.rid;
+    el.textContent = displayNum[c.colorIdx] != null ? displayNum[c.colorIdx] : '?';
+    el.style.color = '#2563b0';
+
+    // Tamaño proporcional al área de la región: regiones grandes llevan
+    // números más legibles, regiones pequeñas no saturan el dibujo.
+    const sizePx = Math.max(16, Math.min(30, 13 + Math.sqrt(c.count) * 0.5));
+    el.style.width = sizePx + 'px';
+    el.style.height = sizePx + 'px';
+    el.style.fontSize = Math.max(9, sizePx * 0.46) + 'px';
+
+    let leftP = (c.cx / gw * 100);
+    let topP = (c.cy / gh * 100);
+    leftP = Math.max(2, Math.min(98, leftP));
+    topP = Math.max(2, Math.min(98, topP));
+    el.style.left = leftP + '%';
+    el.style.top = topP + '%';
+
+    labelsDiv.appendChild(el);
+  });
+}
+
+/* ──────────────────────────────────────────────── INTERACTION ──────────────────────────────────────────────── */
+function setupCanvasInteraction(canvas) {
+  canvas.replaceWith(canvas.cloneNode(true));
+  const freshCanvas = document.getElementById('gameCanvas');
+  freshCanvas.addEventListener('pointerdown', onCanvasPointer, { passive: false });
+}
+
+function onCanvasPointer(e) {
+  e.preventDefault();
+  if (!gameState) return;
+
+  const canvas = document.getElementById('gameCanvas');
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = gameState.gw / rect.width;
+  const scaleY = gameState.gh / rect.height;
+  const px = Math.floor((e.clientX - rect.left) * scaleX);
+  const py = Math.floor((e.clientY - rect.top) * scaleY);
+
+  if (px < 0 || py < 0 || px >= gameState.gw || py >= gameState.gh) return;
+
+  const pixelIdx = py * gameState.gw + px;
+  const regionId = gameState.regionMap[pixelIdx];
+
+  if (gameState.filled[regionId] === 'auto') return;
+  if (gameState.filled[regionId] === true) return;
+
+  gameState.selectedRegion = regionId;
+
+  if (gameState.selectedColor !== null) {
+    tryFill(regionId, gameState.selectedColor);
+  } else {
+    document.getElementById('paletteHint').textContent = 'elige un color 🎨';
+  }
+}
+
+function selectColor(colorIdx) {
+  if (!gameState) return;
+  gameState.selectedColor = colorIdx;
+
+  document.querySelectorAll('.swatch-row').forEach(r => r.classList.remove('active'));
+  const sw = document.getElementById('swatch-' + colorIdx);
+  if (sw) sw.classList.add('active');
+
+  document.getElementById('paletteHint').textContent = 'toca una región~';
+
+  if (gameState.selectedRegion !== null && !gameState.filled[gameState.selectedRegion]) {
+    tryFill(gameState.selectedRegion, colorIdx);
+  }
+}
+
+function tryFill(regionId, colorIdx) {
+  if (!gameState) return;
+  const region = gameState.regions[regionId];
+  if (!region || gameState.filled[regionId]) return;
+
+  if (region.colorIdx === colorIdx) {
+    gameState.filled[regionId] = true;
+    gameState.filledCount++;
+
+    const [r, g, b] = gameState.palette[colorIdx];
+    for (const i of gameState.regionPixels[regionId]) {
+      gameState.workingData[i*4] = r;
+      gameState.workingData[i*4+1] = g;
+      gameState.workingData[i*4+2] = b;
+      gameState.workingData[i*4+3] = 255;
+    }
+    commitDraw();
+
+    const lbl = document.getElementById('label-' + regionId);
+    if (lbl) { lbl.classList.add('faded'); }
+
+    const pct = (gameState.filledCount / gameState.totalRegions) * 100;
+    document.getElementById('progressBar').style.width = Math.min(100, pct) + '%';
+
+    const sw = document.getElementById('swatch-' + colorIdx);
+    const allDone = gameState.regions.every((r, rid) => {
+      if (r.colorIdx !== colorIdx) return true;
+      if (gameState.filled[rid] === 'auto') return true;
+      return gameState.filled[rid] === true;
+    });
+    if (allDone && sw) sw.classList.add('correct');
+
+    document.getElementById('paletteHint').textContent = '¡bien! ✨';
+
+    if (gameState.filledCount >= gameState.totalRegions) {
+      setTimeout(showWinScreen, 500);
+    }
+  } else {
+    const canvas = document.getElementById('gameCanvas');
+    canvas.style.animation = 'none';
+    setTimeout(() => { canvas.style.animation = 'shake 0.4s'; }, 10);
+    document.getElementById('paletteHint').textContent = 'no es… intenta otro 🙈';
+  }
+}
+
+function commitDraw() {
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.createImageData(gameState.gw, gameState.gh);
+  imgData.data.set(gameState.workingData);
+  ctx.putImageData(imgData, 0, 0);
+}
+
+/* ──────────────────────────────────────────────── WIN ──────────────────────────────────────────────── */
+function showWinScreen() {
+  showScreen('winScreen');
+  const srcCanvas = document.getElementById('gameCanvas');
+  const winCanvas = document.getElementById('winCanvas');
+  winCanvas.width = srcCanvas.width;
+  winCanvas.height = srcCanvas.height;
+  const scale = Math.min(280 / srcCanvas.width, 200 / srcCanvas.height, 1);
+  winCanvas.style.width = Math.round(srcCanvas.width * scale) + 'px';
+  winCanvas.style.height = Math.round(srcCanvas.height * scale) + 'px';
+  winCanvas.getContext('2d').drawImage(srcCanvas, 0, 0);
+}
+
+/* ──────────────────────────────────────────────── SPARKLES ──────────────────────────────────────────────── */
+// Genera un puñado de chispitas blancas que flotan lentamente de abajo
+// hacia arriba con un parpadeo suave, dando ese aire kawaii al fondo.
+// Se reciclan (loop) en vez de crear nuevas constantemente, para que el
+// coste sea mínimo incluso en móviles.
+function initSparkles() {
+  const layer = document.getElementById('sparkleLayer');
+  if (!layer) return;
+  const glyphs = ['✦', '✧', '⋆', '✦'];
+  const COUNT = window.innerWidth < 640 ? 14 : 24;
+
+  for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement('span');
+    el.className = 'sparkle';
+    el.textContent = glyphs[i % glyphs.length];
+
+    const size = 8 + Math.random() * 16;
+    const left = Math.random() * 100;
+    const floatDuration = 14 + Math.random() * 16;
+    const twinkleDuration = 1.6 + Math.random() * 2.2;
+    const delay = Math.random() * floatDuration;
+
+    el.style.left = left + 'vw';
+    el.style.top = (100 + Math.random() * 20) + 'vh';
+    el.style.fontSize = size + 'px';
+    el.style.animationDuration = floatDuration + 's, ' + twinkleDuration + 's';
+    el.style.animationDelay = '-' + delay + 's, -' + (Math.random() * twinkleDuration) + 's';
+
+    layer.appendChild(el);
+  }
+}
+
+/* ──────────────────────────────────────────────── INIT ──────────────────────────────────────────────── */
+buildGrid();
+initSparkles();
+</script>
+
+</body>
+</html>
